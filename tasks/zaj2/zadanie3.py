@@ -2,6 +2,12 @@
 
 import math
 
+def new_range(x0,xN,n):
+    lista=[]
+    for i in range(0,n-1):
+        lista.append(x0+i*(xN-x0)/(n-1))
+    lista.append(xN)
+    return lista
 
 class Integrator(object):
 
@@ -18,6 +24,17 @@ class Integrator(object):
         ifów.
 
     """
+    parametr=[0,0,0,0,0,0,0,0,0,0,0,0]
+    parametr[2] =[    1,     1]
+    parametr[3] =[    1,     3,     1]
+    parametr[4] =[    1,     3,     3,     1]
+    parametr[5] =[    7,    32,    12,    32,      7]
+    parametr[6] =[   19,    75,    50,    50,     75,    19]
+    parametr[7] =[   41,   216,    27,   272,     27,   216,     41]
+    parametr[8] =[  751,  3577,  1323,  2989,   2989,  1323,   3577,   751]
+    parametr[9] =[  989,  5888,  -928, 10496,  -4540, 10496,   -928,  5888,   989]
+    parametr[10]=[ 2827, 15741,  1080, 19344,   5778,  5778,  19344,  1080, 15741,  2857]
+    parametr[11]=[16067,106300,-48525,272400,-260550,427368,-260550,272400,-48525,106300,16067]
 
     @classmethod
     def get_level_parameters(cls, level):
@@ -31,6 +48,7 @@ class Integrator(object):
                  [1, 3, 1] itp.
         :rtype: List of integers
         """
+        return parametr[level]
 
     def __init__(self, level):
         """
@@ -53,7 +71,7 @@ class Integrator(object):
 
             1. Dzielimy zakres na ``num_evaluations/self.level`` przdziałów.
                Jeśli wyrażenie nie dzieli się bez reszty, należy wziąć najmiejszą
-               liczbę całkowitą większą od `num_evaluations/self.level``. 
+               liczbę całkowitą większą od `num_evaluations/self.level``.
             2. Na każdym uruchamiamy metodę NC stopnia ``self.level``
             3. Wyniki sumujemy.
 
@@ -64,6 +82,19 @@ class Integrator(object):
         :return: Wynik całkowania.
         :rtype: float
         """
+        nbin=math.ceil(num_evaluations/self.level)
+        start=func_range[0]
+        stop=func_range[1]
+        calka=0
+        for x in new_range(start,stop,nbin):
+            if(x!=stop):
+                pkt=new_range(x,x+(stop-start)/(nbin-1),self.level)
+                part=0
+                for i in range(self.level):
+                    part+=pkt[i]*self.parametr[self.level][i]
+                calka+=part/sum(self.parametr[self.level])*((stop-start)/(nbin-1))
+                print(calka)
+        return calka
 
 
 if __name__ == '__main__':
